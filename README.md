@@ -1,4 +1,4 @@
-# 流形优化与二次规划算法库
+# 流形优化与二次规划算法实现
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.7+-blue.svg" alt="Python">
