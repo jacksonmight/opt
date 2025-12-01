@@ -202,7 +202,7 @@ def bb_method(manifold, f, euclidean_grad, X0,
     }
 
 # 实验参数
-n, p = 20, 5  # 减小问题规模
+n, p = 20, 5  
 manifold = StiefelManifold(n, p)
 f_func, euclidean_grad = generate_quadratic_function(n, p)
 X0 = manifold.random_point()

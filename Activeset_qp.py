@@ -95,7 +95,7 @@ def active_set_qp_corrected(Q, c, A, b, x0, max_iter=100, tol=1e-6):
                 x = x_new
                 print("走满步，工作集不变")
 
-        history.append((x.copy(), set(W)))  # 记录历史
+        history.append((x.copy(), set(W))) 
 
     obj_value = 0.5 * x.T @ Q @ x + c.T @ x
     return x, obj_value, history
@@ -106,8 +106,8 @@ c = np.array([-2, -6])
 A = np.array([[-1, 2], [1, 2], [1, -2], [-1, 0], [0, -1]])
 b = np.array([2, 6, 2, 0, 0])
 
-# 选择一个可行的初始点，确保它在可行域内，但不要直接是最优点
-x0 = np.array([0.0, 0.0])  # 这个点通常在可行域内（需验证A*x0<=b）
+# 选择一个可行的初始点，确保它在可行域内
+x0 = np.array([0.0, 0.0])  
 
 print("=== 使用积级集算法进行计算 ===")
 x_opt_corrected, f_opt_corrected, history_corrected = active_set_qp_corrected(Q, c, A, b, x0)
