@@ -3,14 +3,14 @@ import scipy.linalg as la
 import time
 
 def riemannian_gradient(X, A):
-    """计算黎曼梯度: grad f(X) = AX - X sym(X^T AX) """
+    """计算黎曼梯度"""
     euclidean_grad = A @ X
     Xt_grad = X.T @ euclidean_grad
     sym_term = (Xt_grad + Xt_grad.T) / 2
     return euclidean_grad - X @ sym_term
 
 def retraction_QR(X, V):
-    """基于QR分解的收缩映射: R_X(V) = qf(X + V) """
+    """基于QR分解的收缩映射"""
     Z = X + V
     Q, _ = la.qr(Z, mode='economic')
     return Q
@@ -66,7 +66,6 @@ def lbfgs_double_loop(grad, S, Y, H0):
         q -= alpha_i * y_i
         alpha_list.append(alpha_i)
     
-    # 应用初始Hessian近似
     r = H0 * q
     
     # 第二个循环：从最旧到最新的向量对

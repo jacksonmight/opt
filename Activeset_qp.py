@@ -91,7 +91,6 @@ def active_set_qp_corrected(Q, c, A, b, x0, max_iter=100, tol=1e-6):
                 W.add(blocking_constraint)
                 x = x_new
             else:
-                # 走满步，工作集不变
                 x = x_new
                 print("走满步，工作集不变")
 

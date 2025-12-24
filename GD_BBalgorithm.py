@@ -15,12 +15,12 @@ class StiefelManifold:
         return Q
     
     def projection(self, X, Z):
-        """切空间投影: Π_X(Z) = Z - X sym(X^T Z) """
+        """切空间投影"""
         sym = 0.5 * (X.T @ Z + Z.T @ X)
         return Z - X @ sym
     
     def retraction_qr(self, X, V):
-        """基于QR分解的收缩映射 (4.1.14) """
+        """基于QR分解的收缩映射"""
         # 经典Gram-Schmidt正交化 
         Q = np.zeros_like(X)
         for j in range(self.p):
@@ -37,7 +37,7 @@ class StiefelManifold:
         return self.projection(X, euclidean_grad)
 
 def generate_quadratic_function(n, p):
-    """生成Stiefel流形上的随机二次函数 """
+    """生成Stiefel流形上的随机二次函数"""
     A = np.random.randn(n, n)
     A = A.T @ A + n * np.eye(n)  # 对称正定矩阵
     B = np.random.randn(n, p)
@@ -53,9 +53,9 @@ def generate_quadratic_function(n, p):
 def backtracking_line_search(manifold, f, X, v, grad_fX_v, 
                             t_init=1.0, rho=0.5, c1=1e-4, M=0, 
                             f_history=None):
-    """回退法线搜索 (Algorithm 4.2) """
+    """回退法线搜索 """
     t = t_init
-    # 非单调线搜索条件 (定义4.2.2)
+    # 非单调线搜索条件
     if M > 0 and f_history is not None and len(f_history) > 0:
         f_ref = max(f_history[-min(len(f_history), M):])
     else:  # 单调线搜索
@@ -72,7 +72,7 @@ def backtracking_line_search(manifold, f, X, v, grad_fX_v,
 
 def gradient_descent(manifold, f, euclidean_grad, X0, 
                    rho=0.5, c1=1e-4, M=0, max_iter=1000, tol=1e-6):
-    """Algorithm 4.3: 梯度下降法 """
+    """梯度下降法 """
     X = X0.copy()
     f_vals = [f(X)]
     grad_norms = []
@@ -112,7 +112,7 @@ def gradient_descent(manifold, f, euclidean_grad, X0,
 def bb_method(manifold, f, euclidean_grad, X0, 
              rho=0.5, c1=1e-4, M=10, alpha_min=1e-10, 
              alpha_max=1e10, max_iter=1000, tol=1e-6):
-    """Algorithm 4.4: 非单调线搜索的BB方法 """
+    """非单调线搜索的BB方法 """
     X = X0.copy()
     f_vals = [f(X)]
     grad_norms = []
@@ -135,14 +135,12 @@ def bb_method(manifold, f, euclidean_grad, X0,
         if grad_norm < tol:
             break
         
-        # 非单调线搜索 (4.2.23)
+        # 非单调线搜索 
         alpha = alpha_hat
         backtrack_count = 0
         while True:
             X_new = manifold.retraction_qr(X, -alpha * grad)
             f_new = f(X_new)
-            
-            # 非单调条件 (定义4.2.2)
             if M > 0 and len(f_vals) > 0:
                 f_ref = max(f_vals[-min(len(f_vals), M):])
             else:
@@ -155,35 +153,32 @@ def bb_method(manifold, f, euclidean_grad, X0,
                 
             alpha *= rho
             backtrack_count += 1
-            if alpha < alpha_min:  # 防止步长过小
+            if alpha < alpha_min:  
                 alpha = alpha_min
                 break
         
         backtrack_counts.append(backtrack_count)
         alpha_history.append(alpha)
         
-        # 保存旧梯度
         grad_prev = grad.copy()
         X_prev = X.copy()
         
-        # 更新迭代点
         X = X_new
         f_vals.append(f_new)
         
-        # 计算新梯度
         egrad = euclidean_grad(X)
         grad = manifold.riemannian_gradient(X, egrad)
         grad_norm = la.norm(grad, 'fro')
         grad_norms.append(grad_norm)
         
-        # 计算BB步长 (简化平行移动) [20](@ref)
+        # 计算BB步长
         if k >= 1:
-            s = X - X_prev  # 简化切向量
-            y = grad - grad_prev  # 简化梯度差
+            s = X - X_prev 
+            y = grad - grad_prev 
             
-            # 计算BB步长 (4.4.54)
+            # 计算BB步长
             sTy = np.trace(s.T @ y)
-            if abs(sTy) > 1e-15:  # 避免除以零
+            if abs(sTy) > 1e-15: 
                 if k % 2 == 1:  # 奇数步用SBB
                     alpha_abb = sTy / np.trace(y.T @ y)
                 else:  # 偶数步用LBB
